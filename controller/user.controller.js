@@ -1,7 +1,7 @@
 const LastModel = require('../model/user.model')
 
 
-const register = (req, res) =>{
+const userRegister = (req, res) =>{
     let student = new LastModel(req.body)
     student.save()
     .then((result)=>{
@@ -11,9 +11,9 @@ const register = (req, res) =>{
     })
 }
 
-const login = (req, res) =>{
+const userLogin = (req, res) =>{
     const {email, password} = req.body
     console.log(req.body);
 }
 
-module.exports = {register, login}
+module.exports = {userRegister, userLogin}
