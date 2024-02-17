@@ -1,4 +1,4 @@
-const LastModel = require('../model/user.model')
+const adminModel = require('../model/admin.model')
 
 
 const adminRegister = (req, res) =>{

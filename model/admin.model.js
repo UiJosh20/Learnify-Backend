@@ -3,7 +3,7 @@ const URI = process.env.URL
 
 mongoose.connect(URI)
 .then((response)=>{
-    console.log("adminconnected to database successfully");
+    console.log("Admin connected to database successfully");
 })
 .catch((err)=>{
     console.log(err);
