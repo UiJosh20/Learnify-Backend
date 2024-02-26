@@ -9,8 +9,8 @@ const app = express()
 app.use(cors())
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
-app.use('/user', userRoutes)
-app.use('/admin', adminRoutes)
+app.use('/', userRoutes)
+app.use('/', adminRoutes)
 
 
 
