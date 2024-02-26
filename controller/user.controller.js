@@ -31,8 +31,8 @@ function sendUniqueNumberToEmail(email, uniqueNumber) {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'adeyeriseun0@gmail.com',
-                pass: 'sEUn2002'
+                user: '',
+                pass: ''
             }
         });
 
