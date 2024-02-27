@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const URI = process.env.URL
 
 mongoose.connect(URI)
@@ -15,8 +16,16 @@ let studentSchema = mongoose.Schema({
     lastName:String,
     email:{type: String, required:true, unique:true},
     password:{type:String, required:true,},
-    uniqueNumber: { type: Number, unique: true }
+    matricNumber: { type: String, unique: true }
 })
+
+studentSchema.pre("save", function(next){
+    bcrypt.hash(this.password, 10, ((err, hash)=>{
+      console.log(hash);
+      this.password = hash
+      next()
+    }))
+  })
 
 let LastModel = mongoose.model('LastModel', studentSchema);
 
