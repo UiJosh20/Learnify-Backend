@@ -1,6 +1,9 @@
 const LastModel = require('../model/user.model');
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
+require("dotenv").config()
+secret = process.env.SECRET
+const jwt = require("jsonwebtoken")
 
 
 const generateUniqueNumber = () => {
@@ -82,8 +85,9 @@ const userLogin = (req, res) => {
                     console.log("Incorrect password");
                     return res.status(401).json({ message: "Incorrect password" });
                 }else{
+                    const token = jwt.sign({ matricNumber }, secret, { expiresIn: '1h' });
                     console.log("User signed in successfully");
-                    res.send({ message: "User signed in successfully", status: true, user: student });
+                    res.send({ message: "User signed in successfully", status: true, user: student, token:token});
                 }
             });
         })
@@ -94,4 +98,17 @@ const userLogin = (req, res) => {
 };
 
 
-module.exports = { userRegister, userLogin };
+const verifyToken = (req, res)=>{
+    const { token } = req.body;
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+      if (err) {
+        console.error('Token verification failed:', err);
+      } else {
+        console.log(decoded);
+        console.log('Token verified successfully');
+        res.send({ message: "Token verified successfully", status: true, decoded: decoded, valid:true, token:token });
+      }
+    });
+  }
+
+module.exports = { userRegister, userLogin, verifyToken};
