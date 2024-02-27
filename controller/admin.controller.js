@@ -1,9 +1,9 @@
 const adminModel = require('../model/admin.model')
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
-// require("dotenv").config()
-// secret = process.env.SECRET
-// const jwt = require("jsonwebtoken")
+require("dotenv").config()
+secret = process.env.SECRET
+const jwt = require("jsonwebtoken")
 
 const generateadminId = () => {
     const randomNumber = Math.floor(Math.random() * 10000).toString().padStart(4, '0'); 
@@ -58,7 +58,7 @@ const sendUniqueNumberToEmail = (email, adminId) => {
 const adminLogin = (req, res) =>{
     const {adminId, password} = req.body
     
-    LastModel.findOne({ adminId })
+    adminModel.findOne({ adminId })
         .then((staff) => {
             if (!staff) {
                 console.log("User not found");
@@ -75,7 +75,7 @@ const adminLogin = (req, res) =>{
                     console.log("Incorrect password");
                     return res.status(401).json({ message: "Incorrect password" });
                 }else{
-                    const token = jwt.sign({ matricNumber }, secret, { expiresIn: '1h' });
+                    const token = jwt.sign({ adminId }, secret, { expiresIn: '1h' });
                     console.log("User signed in successfully");
                     res.send({ message: "User signed in successfully", status: true, user: staff, token:token});
                 }
