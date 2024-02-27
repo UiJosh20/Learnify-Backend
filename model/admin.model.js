@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt")
 const URI = process.env.URL
 
 mongoose.connect(URI)
@@ -14,8 +15,18 @@ let staffSchema = mongoose.Schema({
     firstName:String,
     lastName:String,
     email:{type: String, required:true, unique:true},
-    password:{type:String, required:true, unique:true}
+    password:{type:String, required:true},
+    adminId: { type: String, unique: true }
+
 })
+
+staffSchema.pre("save", function(next){
+    bcrypt.hash(this.password, 10, ((err, hash)=>{
+      console.log(hash);
+      this.password = hash
+      next()
+    }))
+  })
 
 let adminModel = mongoose.model('adminModel', staffSchema);
 

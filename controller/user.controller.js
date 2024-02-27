@@ -18,7 +18,6 @@ const generateUniqueNumber = () => {
 
 
 const userRegister = (req, res) => {
-    console.log(req.body);
     const matricNumber = generateUniqueNumber();
     const student = new LastModel(req.body);
     const { email } = req.body
@@ -36,9 +35,8 @@ const userRegister = (req, res) => {
 };
 
 
-function sendUniqueNumberToEmail(email, matricNumber) {
+const sendUniqueNumberToEmail = (email, matricNumber) => {
     return new Promise((resolve, reject) => {
-        // Example implementation using nodemailer
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -50,8 +48,8 @@ function sendUniqueNumberToEmail(email, matricNumber) {
         const mailOptions = {
             from: 'adeyeriseun10@gmail.com',
             to: email,
-            subject: 'Learnify Unique Number',
-            text: `Your unique number is: ${matricNumber}`
+            subject: 'Learnify Student Matric Number (S.M.N)',
+            text: `Your Student Matric Number (S.M.N) is : ${matricNumber}`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -99,7 +97,6 @@ const userLogin = (req, res) => {
 
 
 const verifyToken = (req, res)=>{
-    console.log(req.body);
     const { token } = req.body;
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
