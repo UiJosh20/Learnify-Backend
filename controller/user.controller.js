@@ -99,6 +99,7 @@ const userLogin = (req, res) => {
 
 
 const verifyToken = (req, res)=>{
+    console.log(req.body);
     const { token } = req.body;
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
       if (err) {
