@@ -63,8 +63,7 @@ function sendUniqueNumberToEmail(email, matricNumber) {
 
 
 const userLogin = (req, res) => {
-    console.log(req.body);
-    const { matricNumber, password } = req.body
+    const { matricNumber, password } = req.body;
 
     LastModel.findOne({ matricNumber })
         .then((student) => {
@@ -73,16 +72,26 @@ const userLogin = (req, res) => {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            bcrypt.compare(password, student.password)
-                .then((match) => {
-                    if (!match) {
-                        console.log("Incorrect password");
-                        return res.status(401).json({ message: "Incorrect password" });
-                    }
+            bcrypt.compare(password, student.password, (err, match) => {
+                if (err) {
+                    console.log("Error comparing passwords:", err);
+                    return res.status(500).json({ message: "Internal Server Error" });
+                }
 
-                    res.send({ message: "User signed in successfully", status: true, user: student, });
-                })
+                if (!match) {
+                    console.log("Incorrect password");
+                    return res.status(401).json({ message: "Incorrect password" });
+                }else{
+                    console.log("User signed in successfully");
+                    res.send({ message: "User signed in successfully", status: true, user: student });
+                }
+            });
+        })
+        .catch((error) => {
+            console.error("Error finding user:", error);
+            res.status(500).json({ message: "Internal Server Error" });
         });
-}
+};
+
 
 module.exports = { userRegister, userLogin };
