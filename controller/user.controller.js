@@ -147,6 +147,7 @@ const forgotten = (req, res) => {
   const verifyOTP = (req, res)=> {
       console.log(req.body);
       const {otp} = req.body
+      
   }
 
 
@@ -164,7 +165,9 @@ const forgotten = (req, res) => {
             from: 'adeyeriseun10@gmail.com',
             to: email,
             subject: 'Learnify forgotten pasword OTP',
-            text: `Your one time password OTP is : ${otp}`
+            text: `Your one time password OTP is : ${otp}. 
+            This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
+            `
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
