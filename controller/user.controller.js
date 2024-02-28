@@ -109,4 +109,73 @@ const verifyToken = (req, res)=>{
     });
   }
 
-module.exports = { userRegister, userLogin, verifyToken};
+
+
+  const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+};
+
+const forgotten = (req, res) => {
+    const { email } = req.body;
+    const otp = generateOTP(); 
+    const expirationTime = new Date(Date.now() + 30 * 60 * 1000); 
+
+    LastModel.findOneAndUpdate(
+        { email },
+        { otp, otpExpiration: expirationTime }, 
+        { new: true, upsert: true } 
+    )
+    .then((user) => {
+        if(user){
+            sendOTPToEmail(email, otp)
+                .then(() => {
+                    res.status(200).send({ message: 'OTP sent to email', status: true, otp: otp });
+                })
+                .catch((error) => {
+                    res.status(500).json({ error: 'Failed to send OTP to email' });
+                });
+        }else{
+            console.log("user not found");
+        }
+    })
+    .catch((err) => {
+        res.status(500).json({ error: 'Database error' });
+    });
+}
+
+
+  const verifyOTP = (req, res)=> {
+      console.log(req.body);
+      const {otp} = req.body
+  }
+
+
+  const sendOTPToEmail = (email, otp) => {
+    return new Promise((resolve, reject) => {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'adeyeriseun10@gmail.com',
+                pass: 'xwmb exbg izak jkvm'
+            }
+        });
+
+        const mailOptions = {
+            from: 'adeyeriseun10@gmail.com',
+            to: email,
+            subject: 'Learnify forgotten pasword OTP',
+            text: `Your one time password OTP is : ${otp}`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+
+module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP};
