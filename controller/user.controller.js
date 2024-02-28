@@ -144,11 +144,26 @@ const forgotten = (req, res) => {
 }
 
 
-  const verifyOTP = (req, res)=> {
-      console.log(req.body);
-      const {otp} = req.body
-      
-  }
+const verifyOTP = (req, res) => {
+    const { otp } = req.body;
+
+    LastModel.findOne({ email })
+        .then((user) => {
+            if (user) {
+                if (user.otp && user.otpExpiration && user.otp === otp && user.otpExpiration > new Date()) {
+                    res.status(200).json({ message: 'OTP verified successfully', status: true });
+                } else {
+                    res.status(400).json({ error: 'Invalid or expired OTP' });
+                }
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        })
+        .catch((error) => {
+            res.status(500).json({ error: 'Database error' });
+        });
+}
+
 
 
   const sendOTPToEmail = (email, otp) => {
@@ -165,8 +180,8 @@ const forgotten = (req, res) => {
             from: 'adeyeriseun10@gmail.com',
             to: email,
             subject: 'Learnify forgotten pasword OTP',
-            text: `Your one time password OTP is : ${otp}. 
-            This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
+            text: `Your one time password OTP is : ${otp}
+This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
             `
         };
 
