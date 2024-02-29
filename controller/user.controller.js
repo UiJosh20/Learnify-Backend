@@ -16,22 +16,27 @@ const generateUniqueNumber = () => {
 
 
 
+
+
 const userRegister = (req, res) => {
     const matricNumber = generateUniqueNumber();
-    const student = new LastModel(req.body);
-    const { email } = req.body
-    student.matricNumber = matricNumber;
-    sendUniqueNumberToEmail(email, matricNumber)
+    const otp = generateOTP()
+    const otpExpiration = new Date(Date.now() + 30 * 60 * 1000);
+    const student = new LastModel({ ...req.body, matricNumber, otp, otpExpiration });
+
+    const { email } = req.body;
     student.save()
-        .then(() => {
-            console.log("User saved successfully");
+    .then(() => {
+        console.log("User saved successfully");
+        sendUniqueNumberToEmail(email, matricNumber);
             res.status(201).send({ message: "User registered successfully", status: 200 });
         })
         .catch((error) => {
-            console.error(error);
+            console.error("Error saving user:", error);
             res.status(500).json({ message: "Internal Server Error" });
         });
 };
+
 
 
 const sendUniqueNumberToEmail = (email, matricNumber) => {
@@ -144,6 +149,7 @@ This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
 }
 
 
+
 const forgotten = (req, res) => {
     const { email } = req.body;
     const otp = generateOTP(); 
@@ -174,18 +180,20 @@ const forgotten = (req, res) => {
 }
 
 
+
+
 const verifyOTP = (req, res) => {
     const { otp } = req.body;
 
     LastModel.findOne({ otp })
         .then((user) => {
-            if(user.otp == otp && user.otpExpiration > new Date()){
+            console.log(user);
+            if(user.otp == otp){
                 
                 res.status(200).json({ message: 'OTP verified successfully', status: true });
             }else{
                 res.status(400).json({ message: 'invalid OTP', status: false });
             }
-            
         })
         .catch((error) => {
             res.status(500).json({ error: 'Database error' });
@@ -209,9 +217,9 @@ const createNewPassword = (req, res) => {
         .then((user) => {
             if (!user) {
                 return res.status(404).send({ message: "User not found", status: false });
-            }else{
-                res.status(200).send({ message: "Password updated successfully", status: true });
             }
+            
+            res.status(200).json({ message: "Password updated successfully", status: true });
         })
         .catch((error) => {
             console.error("Error updating password:", error);

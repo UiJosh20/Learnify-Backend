@@ -19,7 +19,6 @@ let staffSchema = mongoose.Schema({
   adminId: { type: String, unique: true },
     otp: {
     type: String,
-    required: true,
     unique: true
   },
   otpExpiration: {

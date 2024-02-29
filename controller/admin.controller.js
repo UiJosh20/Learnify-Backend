@@ -17,10 +17,10 @@ const adminRegister = (req, res) =>{
     let staff = new adminModel(req.body)
     const { email } = req.body
     staff.adminId = adminId;
-    sendUniqueNumberToEmail(email, adminId)
     staff.save()
     .then((result)=>{
         console.log("admin info saved successfully");
+        sendUniqueNumberToEmail(email, adminId)
         res.status(201).send({ message: "admin registered successfully", status: 200 });
     }).catch((err)=>{
         console.log("Information not saved");
