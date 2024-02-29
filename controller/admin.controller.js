@@ -170,7 +170,7 @@ const verifyOTP = (req, res) => {
     const { otp } = req.body;
     adminModel.findOne({ otp })
         .then((user) => {
-            if(user.otp == otp){
+            if(user.otp == otp && user.otpExpiration > new Date()){
                 
                 res.status(200).json({ message: 'OTP verified successfully', status: true });
             }else{
