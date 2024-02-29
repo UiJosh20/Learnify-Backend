@@ -14,9 +14,11 @@ const generateadminId = () => {
 
 const adminRegister = (req, res) =>{
     let adminId = generateadminId()
-    let staff = new adminModel(req.body)
-    const { email } = req.body
-    staff.adminId = adminId;
+    const otp = generateOTP()
+    const otpExpiration = new Date(Date.now() + 30 * 60 * 1000);
+    const staff = new adminModel({ ...req.body, adminId, otp, otpExpiration });
+
+    const { email } = req.body;
     staff.save()
     .then((result)=>{
         console.log("admin info saved successfully");
@@ -168,7 +170,7 @@ const verifyOTP = (req, res) => {
     const { otp } = req.body;
     adminModel.findOne({ otp })
         .then((user) => {
-            if(user.otp == otp && user.otpExpiration > new Date()){
+            if(user.otp == otp){
                 
                 res.status(200).json({ message: 'OTP verified successfully', status: true });
             }else{
