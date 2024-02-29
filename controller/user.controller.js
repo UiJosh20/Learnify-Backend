@@ -5,7 +5,6 @@ require("dotenv").config()
 secret = process.env.SECRET
 const jwt = require("jsonwebtoken")
 
-
 const generateUniqueNumber = () => {
     const currentYear = new Date().getFullYear().toString();
     const randomNumber = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
@@ -115,10 +114,41 @@ const verifyToken = (req, res)=>{
     return Math.floor(100000 + Math.random() * 900000);
 };
 
+const sendOTPToEmail = (email, otp) => {
+    return new Promise((resolve, reject) => {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'adeyeriseun10@gmail.com',
+                pass: 'xwmb exbg izak jkvm'
+            }
+        });
+
+        const mailOptions = {
+            from: 'adeyeriseun10@gmail.com',
+            to: email,
+            subject: 'Learnify forgotten pasword OTP',
+            text: `Your one time password OTP is : ${otp}
+This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+
 const forgotten = (req, res) => {
     const { email } = req.body;
     const otp = generateOTP(); 
     const expirationTime = new Date(Date.now() + 30 * 60 * 1000); 
+ 
 
     LastModel.findOneAndUpdate(
         { email },
@@ -164,34 +194,33 @@ const verifyOTP = (req, res) => {
 
 
 
-  const sendOTPToEmail = (email, otp) => {
-    return new Promise((resolve, reject) => {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'adeyeriseun10@gmail.com',
-                pass: 'xwmb exbg izak jkvm'
+const createNewPassword = (req, res) => {
+    const { email, password } = req.body;
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send({ message: "Internal Server Error" });
+        }
+        LastModel.findOneAndUpdate(
+            { email },
+            { password: hashedPassword },
+            { new: true }
+        )
+        .then((user) => {
+            if (!user) {
+                return res.status(404).send({ message: "User not found", status: false });
+            }else{
+                res.status(200).send({ message: "Password updated successfully", status: true });
             }
-        });
-
-        const mailOptions = {
-            from: 'adeyeriseun10@gmail.com',
-            to: email,
-            subject: 'Learnify forgotten pasword OTP',
-            text: `Your one time password OTP is : ${otp}
-This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
-            `
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve();
-            }
+        })
+        .catch((error) => {
+            console.error("Error updating password:", error);
+            res.status(500).json({ message: "Internal Server Error" });
         });
     });
-}
+};
 
 
-module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP};
+
+
+module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP, createNewPassword};
