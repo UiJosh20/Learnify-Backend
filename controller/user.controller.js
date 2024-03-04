@@ -10,7 +10,6 @@ const generateUniqueNumber = () => {
     const randomNumber = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
     const randomAlphabets = String.fromCharCode(65 + Math.floor(Math.random() * 26)) + String.fromCharCode(65 + Math.floor(Math.random() * 26));
     const matricNumber = currentYear + randomNumber + randomAlphabets;
-
     return matricNumber;
 }
 
@@ -26,9 +25,9 @@ const userRegister = (req, res) => {
 
     const { email } = req.body;
     student.save()
-    .then(() => {
-        console.log("User saved successfully");
-        sendUniqueNumberToEmail(email, matricNumber);
+        .then(() => {
+            console.log("User saved successfully");
+            sendUniqueNumberToEmail(email, matricNumber);
             res.status(201).send({ message: "User registered successfully", status: 200 });
         })
         .catch((error) => {
@@ -68,8 +67,8 @@ const sendUniqueNumberToEmail = (email, matricNumber) => {
 
 
 const userLogin = (req, res) => {
-    const { matricNumber, password } = req.body;
-
+    let { matricNumber, password } = req.body;
+    matricNumber = matricNumber.toUpperCase();
     LastModel.findOne({ matricNumber })
         .then((student) => {
             if (!student) {
@@ -86,10 +85,10 @@ const userLogin = (req, res) => {
                 if (!match) {
                     console.log("Incorrect password");
                     return res.status(401).json({ message: "Incorrect password" });
-                }else{
+                } else {
                     const token = jwt.sign({ matricNumber }, secret, { expiresIn: '1h' });
                     console.log("User signed in successfully");
-                    res.send({ message: "User signed in successfully", status: true, user: student, token:token});
+                    res.send({ message: "User signed in successfully", status: true, user: student, token: token });
                 }
             });
         })
@@ -100,22 +99,22 @@ const userLogin = (req, res) => {
 };
 
 
-const verifyToken = (req, res)=>{
+const verifyToken = (req, res) => {
     const { token } = req.body;
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
-      if (err) {
-        console.error('Token verification failed:', err);
-      } else {
-        console.log(decoded);
-        console.log('Token verified successfully');
-        res.send({ message: "Token verified successfully", status: true, decoded: decoded, valid:true, token:token });
-      }
+        if (err) {
+            console.error('Token verification failed:', err);
+        } else {
+            console.log(decoded);
+            console.log('Token verified successfully');
+            res.send({ message: "Token verified successfully", status: true, decoded: decoded, valid: true, token: token });
+        }
     });
-  }
+}
 
 
 
-  const generateOTP = () => {
+const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000);
 };
 
@@ -152,31 +151,31 @@ This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
 
 const forgotten = (req, res) => {
     const { email } = req.body;
-    const otp = generateOTP(); 
-    const expirationTime = new Date(Date.now() + 30 * 60 * 1000); 
- 
+    const otp = generateOTP();
+    const expirationTime = new Date(Date.now() + 30 * 60 * 1000);
+
 
     LastModel.findOneAndUpdate(
         { email },
-        { otp, otpExpiration: expirationTime }, 
-        { new: true, upsert: true } 
+        { otp, otpExpiration: expirationTime },
+        { new: true, upsert: true }
     )
-    .then((user) => {
-        if(user){
-            sendOTPToEmail(email, otp)
-                .then(() => {
-                    res.status(200).send({ message: 'OTP sent to email', status: true, otp: otp });
-                })
-                .catch((error) => {
-                    res.status(500).json({ error: 'Failed to send OTP to email' });
-                });
-        }else{
-            console.log("user not found");
-        }
-    })
-    .catch((err) => {
-        res.status(500).json({ error: 'Database error' });
-    });
+        .then((user) => {
+            if (user) {
+                sendOTPToEmail(email, otp)
+                    .then(() => {
+                        res.status(200).send({ message: 'OTP sent to email', status: true, otp: otp });
+                    })
+                    .catch((error) => {
+                        res.status(500).json({ error: 'Failed to send OTP to email' });
+                    });
+            } else {
+                console.log("user not found");
+            }
+        })
+        .catch((err) => {
+            res.status(500).json({ error: 'Database error' });
+        });
 }
 
 
@@ -188,10 +187,10 @@ const verifyOTP = (req, res) => {
     LastModel.findOne({ otp })
         .then((user) => {
             console.log(user);
-            if(user.otp == otp){
-                
+            if (user.otp == otp) {
+
                 res.status(200).json({ message: 'OTP verified successfully', status: true });
-            }else{
+            } else {
                 res.status(400).json({ message: 'invalid OTP', status: false });
             }
         })
@@ -214,21 +213,21 @@ const createNewPassword = (req, res) => {
             { password: hashedPassword },
             { new: true }
         )
-        .then((user) => {
-            if (!user) {
-                return res.status(404).send({ message: "User not found", status: false });
-            }
-            
-            res.status(200).json({ message: "Password updated successfully", status: true });
-        })
-        .catch((error) => {
-            console.error("Error updating password:", error);
-            res.status(500).json({ message: "Internal Server Error" });
-        });
+            .then((user) => {
+                if (!user) {
+                    return res.status(404).send({ message: "User not found", status: false });
+                }
+
+                res.status(200).json({ message: "Password updated successfully", status: true });
+            })
+            .catch((error) => {
+                console.error("Error updating password:", error);
+                res.status(500).json({ message: "Internal Server Error" });
+            });
     });
 };
 
 
 
 
-module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP, createNewPassword};
+module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP, createNewPassword };
