@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
 require("dotenv").config()
 secret = process.env.SECRET
+MAILERPASS = process.env.MAILERPASS
+MAILEREMAIL = process.env.MAILEREMAIL
 const jwt = require("jsonwebtoken")
 
 const generateUniqueNumber = () => {
@@ -21,8 +23,7 @@ const userRegister = (req, res) => {
     const matricNumber = generateUniqueNumber();
     const otp = generateOTP()
     const otpExpiration = new Date(Date.now() + 30 * 60 * 1000);
-    const student = new LastModel({ ...req.body, matricNumber, otp, otpExpiration });
-
+    const student = new LastModel({ ...req.body, matricNumber, otp, otpExpiration })
     const { email } = req.body;
     student.save()
         .then(() => {
@@ -43,13 +44,13 @@ const sendUniqueNumberToEmail = (email, matricNumber) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'adeyeriseun10@gmail.com',
-                pass: 'xwmb exbg izak jkvm'
+                user: MAILEREMAIL,
+                pass: MAILERPASS
             }
         });
 
         const mailOptions = {
-            from: 'adeyeriseun10@gmail.com',
+            from: MAILEREMAIL,
             to: email,
             subject: 'Learnify Student Matric Number (S.M.N)',
             text: `Your Student Matric Number (S.M.N) is : ${matricNumber}`
@@ -229,6 +230,42 @@ const createNewPassword = (req, res) => {
 };
 
 
+const userDashboard = (req, res) => {
+    let upcomingClasses = [
+        {
+            Course: "Software Engineering",
+            Instructor: "Dr. Smith",
+            Date: "2024-03-10",
+            Time: "10:00 AM - 12:00 PM",
+            Location: "Room 301"
+        },
+        {
+            Course: "Database Systems",
+            Instructor: "Prof. Johnson",
+            Date: "2024-03-12",
+            Time: "2:00 PM - 4:00 PM",
+            Location: "Room 302"
+        },
+        {
+            Course: "Web Development",
+            Instructor: "Dr. Patel",
+            Date: "2024-03-15",
+            Time: "9:00 AM - 11:00 AM",
+            Location: "Room 303"
+        },
+        {
+            Course: "Algorithms",
+            Instructor: "Dr. Brown",
+            Date: "2024-03-18",
+            Time: "1:00 PM - 3:00 PM",
+            Location: "Room 304"
+        }
+]
+
+console.log(upcomingClasses);
+res.status(200).json({ message: "User Dashboard", upcomingClasses, });
+}
 
 
-module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP, createNewPassword };
+
+module.exports = { userRegister, userLogin, verifyToken, forgotten, verifyOTP, createNewPassword, userDashboard };
