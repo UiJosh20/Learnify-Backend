@@ -71,6 +71,7 @@ const userLogin = (req, res) => {
     matricNumber = matricNumber.toUpperCase();
     LastModel.findOne({ matricNumber })
         .then((student) => {
+            console.log(student)
             if (!student) {
                 console.log("User not found");
                 return res.status(404).json({ message: "User not found" });
@@ -84,7 +85,7 @@ const userLogin = (req, res) => {
 
                 if (!match) {
                     console.log("Incorrect password");
-                    return res.status(401).json({ message: "Incorrect password" });
+                    return res.status(401).send({ message: "Incorrect password" });
                 } else {
                     const token = jwt.sign({ matricNumber }, secret, { expiresIn: '1h' });
                     console.log("User signed in successfully");
