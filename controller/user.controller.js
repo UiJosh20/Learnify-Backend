@@ -261,8 +261,6 @@ const userDashboard = (req, res) => {
             Location: "Room 304"
         }
 ]
-
-console.log(upcomingClasses);
 res.status(200).json({ message: "User Dashboard", upcomingClasses, });
 }
 
