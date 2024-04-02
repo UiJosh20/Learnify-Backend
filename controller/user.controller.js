@@ -133,7 +133,7 @@ const sendOTPToEmail = (email, otp) => {
         const mailOptions = {
             from: 'adeyeriseun10@gmail.com',
             to: email,
-            subject: 'Learnify forgotten pasword OTP',
+            subject: 'Learnify forgotten password OTP',
             text: `Your one time password OTP is : ${otp}
 This OTP is valid for 30 minutes. Please do not share this OTP with anyone.
             `
